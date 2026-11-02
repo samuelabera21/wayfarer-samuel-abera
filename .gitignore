@@ -8,7 +8,7 @@ dist/
 build/
 .next/
 out/
-
+/Wayfarer_Intern_Take_Home.pdf
 # Environment files
 .env
 .env.local
