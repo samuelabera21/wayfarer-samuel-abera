@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, startTransition } from "react";
+import { useEffect, useState, useCallback, startTransition, useMemo } from "react";
 import type { TourSlot } from "../../lib/types";
 import { fetchPlaceTourSlots } from "../../lib/tours-api";
 import { TourSlotItem } from "./TourSlotItem";
@@ -9,11 +9,14 @@ interface TourSlotsSectionProps {
   placeId: number;
 }
 
+const SLOTS_PER_PAGE = 2;
+
 export function TourSlotsSection({ placeId }: TourSlotsSectionProps) {
   const [slots, setSlots] = useState<TourSlot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     let isCancelled = false;
@@ -52,16 +55,60 @@ export function TourSlotsSection({ placeId }: TourSlotsSectionProps) {
     setReloadKey((prev) => prev + 1);
   }, []);
 
+  // Split slots into chunks of SLOTS_PER_PAGE for horizontal sliding
+  const pages = useMemo(() => {
+    const chunks: TourSlot[][] = [];
+    for (let i = 0; i < slots.length; i += SLOTS_PER_PAGE) {
+      chunks.push(slots.slice(i, i + SLOTS_PER_PAGE));
+    }
+    return chunks;
+  }, [slots]);
+
+  const totalPages = Math.max(1, pages.length);
+  const safePage = Math.min(page, totalPages - 1);
+
   return (
-    <section aria-label="Guided tours" className="space-y-4 pt-4 border-t border-slate-100">
+    <section aria-label="Guided tours" className="space-y-3 pt-4 border-t border-slate-100">
+      {/* Header with Title and Horizontal Carousel Controls */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-          Guided tours
-        </h3>
-        {!isLoading && !error && slots.length > 0 && (
-          <span className="text-xs text-slate-400 font-medium">
-            {slots.length} {slots.length === 1 ? "slot" : "slots"} available
-          </span>
+        <div className="flex items-center gap-2">
+          <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            Guided tours
+          </h3>
+          {!isLoading && !error && slots.length > 0 && (
+            <span className="text-[11px] text-slate-400 font-medium">
+              ({slots.length} available)
+            </span>
+          )}
+        </div>
+
+        {/* Carousel pagination arrows (only visible if more than 1 page) */}
+        {!isLoading && !error && totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-medium text-slate-500">
+              {safePage + 1} of {totalPages}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={safePage === 0}
+                aria-label="Previous tour slots"
+                className="w-6 h-6 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-2xs text-xs font-bold"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                disabled={safePage >= totalPages - 1}
+                aria-label="Next tour slots"
+                className="w-6 h-6 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-2xs text-xs font-bold"
+              >
+                ›
+              </button>
+            </div>
+          </div>
         )}
       </div>
 
@@ -101,14 +148,49 @@ export function TourSlotsSection({ placeId }: TourSlotsSectionProps) {
           </p>
         </div>
       ) : (
-        <div className="space-y-2.5">
-          {slots.map((slot) => (
-            <TourSlotItem
-              key={slot.id}
-              slot={slot}
-              onBookSuccess={handleBookSuccess}
-            />
-          ))}
+        <div className="space-y-2">
+          {/* Horizontal sliding container */}
+          <div className="overflow-hidden w-full rounded-2xl">
+            <div
+              className="flex transition-transform duration-300 ease-in-out will-change-transform"
+              style={{ transform: `translateX(-${safePage * 100}%)` }}
+            >
+              {pages.map((pageSlots, pageIdx) => (
+                <div
+                  key={pageIdx}
+                  className="w-full shrink-0 space-y-2.5"
+                  aria-hidden={pageIdx !== safePage}
+                >
+                  {pageSlots.map((slot) => (
+                    <TourSlotItem
+                      key={slot.id}
+                      slot={slot}
+                      onBookSuccess={handleBookSuccess}
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Indicator dots for multiple pages */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-1.5 pt-1">
+              {pages.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setPage(idx)}
+                  aria-label={`Go to tour slots page ${idx + 1}`}
+                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                    idx === safePage
+                      ? "w-4 bg-[#102a4e]"
+                      : "w-1.5 bg-slate-200 hover:bg-slate-300"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </section>

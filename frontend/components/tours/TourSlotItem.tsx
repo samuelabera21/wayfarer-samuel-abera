@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { TourSlot } from "../../lib/types";
 import { bookTourSlot } from "../../lib/tours-api";
+import { ApiError } from "../../lib/api";
 import { useUser } from "../../context/UserContext";
 
 interface TourSlotItemProps {
@@ -35,7 +36,8 @@ export function TourSlotItem({ slot, onBookSuccess }: TourSlotItemProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const isFull = slot.remainingSeats <= 0;
-  const maxSelectable = Math.min(slot.remainingSeats, 10);
+  const maxSelectable = Math.max(1, Math.min(slot.remainingSeats, 10));
+  const effectiveSelectedSeats = isFull ? 1 : Math.min(selectedSeats, maxSelectable);
 
   const handleBook = async () => {
     if (isFull) return;
@@ -50,18 +52,33 @@ export function TourSlotItem({ slot, onBookSuccess }: TourSlotItemProps) {
     setSuccessMessage(null);
 
     try {
-      const result = await bookTourSlot(slot.id, selectedSeats);
+      const result = await bookTourSlot(slot.id, effectiveSelectedSeats);
       setSuccessMessage(
         `Successfully booked ${result.seats} seat${result.seats > 1 ? "s" : ""}!`
       );
       // Notify parent to refresh slot availability
       onBookSuccess();
     } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Failed to complete booking. Please try again.";
-      setError(message);
+      if (err instanceof ApiError && err.status === 409) {
+        // Concurrency conflict: another user reserved remaining seats concurrently
+        const isFullyBooked =
+          err.message.toLowerCase().includes("fully booked") ||
+          err.message.toLowerCase().includes("capacity");
+
+        setError(
+          isFullyBooked
+            ? "Another traveller just reserved the last seat moments ago. This tour is now fully booked."
+            : `Another traveller reserved seats moments ago. ${err.message}. Availability updated.`
+        );
+        // Immediately refresh availability so this slot reflects latest state in real time
+        onBookSuccess();
+      } else {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to complete booking. Please try again.";
+        setError(message);
+      }
     } finally {
       setIsBooking(false);
     }
@@ -114,7 +131,7 @@ export function TourSlotItem({ slot, onBookSuccess }: TourSlotItemProps) {
               </label>
               <select
                 id={`seats-slot-${slot.id}`}
-                value={selectedSeats}
+                value={effectiveSelectedSeats}
                 onChange={(e) => setSelectedSeats(Number(e.target.value))}
                 disabled={isBooking}
                 aria-label={`Number of seats for tour at ${formatSlotTime(slot.startsAt)}`}
