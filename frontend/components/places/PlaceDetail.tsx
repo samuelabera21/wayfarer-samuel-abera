@@ -138,10 +138,11 @@ export function PlaceDetail({
         </div>
 
         {/* Guided Tours and Booking Section */}
-        <TourSlotsSection placeId={place.id} />
+        <TourSlotsSection key={`tours-${place.id}`} placeId={place.id} />
 
         {/* Reviews Section */}
         <ReviewsSection
+          key={`reviews-${place.id}`}
           placeId={place.id}
           onReviewSubmitted={onReviewSubmitted}
         />

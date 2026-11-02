@@ -10,7 +10,7 @@ import { PlaceDetail } from "./PlaceDetail";
 
 export function PlacesExplorer() {
   const [selectedCategory, setSelectedCategory] = useState<PlaceCategory>("All");
-  const [isTopRated, setIsTopRated] = useState(false);
+  const [sortBy, setSortBy] = useState<"default" | "top-rated">("default");
   const [places, setPlaces] = useState<Place[]>([]);
   const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +24,7 @@ export function PlacesExplorer() {
       try {
         const data = await fetchPlaces({
           category: selectedCategory !== "All" ? selectedCategory : undefined,
-          sort: isTopRated ? "top-rated" : undefined,
+          sort: sortBy === "top-rated" ? "top-rated" : undefined,
         });
 
         if (!isCancelled) {
@@ -58,7 +58,7 @@ export function PlacesExplorer() {
     return () => {
       isCancelled = true;
     };
-  }, [selectedCategory, isTopRated, retryCount]);
+  }, [selectedCategory, sortBy, retryCount]);
 
   const selectedPlace =
     places.find((p) => p.id === selectedPlaceId) ?? (places[0] || null);
@@ -68,8 +68,8 @@ export function PlacesExplorer() {
     setIsLoading(true);
   };
 
-  const handleToggleTopRated = () => {
-    setIsTopRated((prev) => !prev);
+  const handleSortChange = (newSort: "default" | "top-rated") => {
+    setSortBy(newSort);
     setIsLoading(true);
   };
 
@@ -88,32 +88,34 @@ export function PlacesExplorer() {
 
   return (
     <div className="space-y-6">
-      {/* Category filters & Top-rated sorting control bar (Sticky on desktop) */}
-      <div className="sticky top-[61px] z-20 bg-slate-50 py-3 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Category filters bar (Sticky on desktop, matching UI sketch) */}
+      <div className="sticky top-[61px] z-20 bg-slate-50 py-3 border-b border-slate-200">
         <CategoryFilter
           selectedCategory={selectedCategory}
           onSelectCategory={handleSelectCategory}
         />
-        <div className="flex items-center justify-between md:justify-end gap-3 shrink-0">
-          <span className="text-sm text-slate-500 font-medium">
-            {isLoading
-              ? "Discovering places..."
-              : `${places.length} ${places.length === 1 ? "place" : "places"} to discover`}
-          </span>
-          <SortControl
-            isTopRated={isTopRated}
-            onToggle={handleToggleTopRated}
-          />
-        </div>
       </div>
 
       {/* Master-Detail Split Screen Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Places List (Sticky & static in viewport while scrolling right side) */}
+        {/* Left Column: Places List with Sort control right above it, matching UI sketch */}
         <section
           aria-label="Places directory"
-          className="lg:col-span-5 lg:sticky lg:top-[132px] lg:self-start lg:max-h-[calc(100vh-9.5rem)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200"
+          className="lg:col-span-5 lg:sticky lg:top-[128px] lg:self-start lg:max-h-[calc(100vh-9.5rem)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200"
         >
+          {/* Sort control bar directly above places list */}
+          <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+            <SortControl
+              sortBy={sortBy}
+              onChange={handleSortChange}
+            />
+            <span className="text-xs text-slate-500 font-medium">
+              {isLoading
+                ? "Discovering places..."
+                : `${places.length} ${places.length === 1 ? "place" : "places"}`}
+            </span>
+          </div>
+
           <PlacesList
             places={places}
             selectedPlaceId={selectedPlace?.id ?? null}
