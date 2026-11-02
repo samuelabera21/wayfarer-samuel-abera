@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Predefined travellers who can act in the application.
+model User {
+  id   BigInt @id @default(autoincrement())
+  name String @db.VarChar(100)
+
+  reviews  Review[]
+  bookings Booking[]
+
+  @@map("users")
+}
+
+// Tourist destinations in Debre Birhan.
+model Place {
+  id           BigInt   @id @default(autoincrement())
+  name         String   @db.VarChar(150)
+  category     String   @db.VarChar(50)
+  description  String   @db.Text
+  openingHours String?  @map("opening_hours") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  reviews   Review[]
+  tourSlots TourSlot[]
+
+  @@index([category], map: "idx_places_category")
+  @@map("places")
+}
+
+// One review per traveller per place.
+model Review {
+  id        BigInt   @id @default(autoincrement())
+  placeId   BigInt   @map("place_id")
+  userId    BigInt   @map("user_id")
+  rating    Int      @db.SmallInt
+  body      String   @db.VarChar(500)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([placeId, userId], map: "uq_reviews_place_user")
+  @@index([userId], map: "idx_reviews_user_id")
+  @@map("reviews")
+}
+
+// Scheduled guided tours for each place.
+model TourSlot {
+  id        BigInt   @id @default(autoincrement())
+  placeId   BigInt   @map("place_id")
+  startsAt  DateTime @map("starts_at") @db.Timestamptz(6)
+  capacity  Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  place    Place     @relation(fields: [placeId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  bookings Booking[]
+
+  @@index([placeId, startsAt], map: "idx_tour_slots_place_starts_at")
+  @@map("tour_slots")
+}
+
+// Traveller reservations for guided tour slots.
+model Booking {
+  id        BigInt   @id @default(autoincrement())
+  slotId    BigInt   @map("slot_id")
+  userId    BigInt   @map("user_id")
+  seats     Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  slot TourSlot @relation(fields: [slotId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([slotId, userId], map: "uq_bookings_slot_user")
+  @@index([userId], map: "idx_bookings_user_id")
+  @@map("bookings")
+}
