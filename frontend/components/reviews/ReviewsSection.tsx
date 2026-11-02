@@ -75,16 +75,16 @@ export function ReviewsSection({
         </h3>
       </div>
 
-      {/* Reviews list */}
-      <ReviewList reviews={reviews} isLoading={isLoading} error={error} />
-
-      {/* Review submission or update form */}
+      {/* Review submission or update form (placed at TOP for immediate visibility) */}
       <ReviewForm
         key={`${placeId}-${currentUser?.id ?? "guest"}-${existingUserReview?.id ?? "new"}`}
         placeId={placeId}
         existingReview={existingUserReview}
         onSuccess={handleReviewSuccess}
       />
+
+      {/* Reviews list */}
+      <ReviewList reviews={reviews} isLoading={isLoading} error={error} />
     </section>
   );
 }
