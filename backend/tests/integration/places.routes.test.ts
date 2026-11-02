@@ -26,6 +26,7 @@ describe("GET /api/places - Integration Tests", () => {
       category: "Food",
       description: "A newly opened cozy coffee house.",
       openingHours: "07:00–20:00",
+      imageUrl: "https://example.com/cafe.jpg",
     },
     {
       id: 2n,
@@ -33,6 +34,7 @@ describe("GET /api/places - Integration Tests", () => {
       category: "History",
       description: "A renowned historical museum.",
       openingHours: "08:30–17:30",
+      imageUrl: "https://example.com/museum.jpg",
     },
     {
       id: 3n,
@@ -40,6 +42,7 @@ describe("GET /api/places - Integration Tests", () => {
       category: "Nature",
       description: "A quiet walking trail with no reviews yet.",
       openingHours: "06:00–18:00",
+      imageUrl: null,
     },
   ];
 
@@ -88,12 +91,14 @@ describe("GET /api/places - Integration Tests", () => {
       category: "Food",
       description: "A newly opened cozy coffee house.",
       openingHours: "07:00–20:00",
+      imageUrl: "https://example.com/cafe.jpg",
       averageRating: 5.0,
       reviewCount: 1,
       weightedRating: 4.17,
     });
     expect(typeof firstPlace.id).toBe("number");
     expect(typeof firstPlace.weightedRating).toBe("number");
+    expect(firstPlace.imageUrl).toBe("https://example.com/cafe.jpg");
 
     // Check place with no reviews
     const unreviewedPlace = res.body[2];
@@ -101,10 +106,12 @@ describe("GET /api/places - Integration Tests", () => {
       id: 3,
       name: "Silent Forest",
       category: "Nature",
+      imageUrl: null,
       averageRating: null,
       reviewCount: 0,
       weightedRating: 0,
     });
+    expect(unreviewedPlace.imageUrl).toBeNull();
   });
 
   it("filters places by category", async () => {
