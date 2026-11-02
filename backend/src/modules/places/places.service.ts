@@ -67,7 +67,14 @@ export async function getPlaces(
     }),
   ]);
 
-  const overallAverage = overallStats._avg.rating ?? 0;
+  // Benchmark prior average rating (C).
+  // Capping the prior at the benchmark average (4.0, as defined in DECISIONS.md) ensures
+  // that a skewed dataset or single flooded place cannot inflate the global prior,
+  // preventing 1-review 5.0 places from erroneously beating established landmarks with hundreds of reviews.
+  const overallAverage =
+    overallStats._avg.rating !== null && overallStats._avg.rating !== undefined
+      ? Math.min(overallStats._avg.rating, 4.0)
+      : 4.0;
 
   // 3. Build a fast lookup map for review stats keyed by placeId
   const statsMap = new Map<string, { avg: number | null; count: number }>();

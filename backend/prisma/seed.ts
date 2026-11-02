@@ -103,7 +103,7 @@ const reviews = [
     // Debre Birhan Silase Church: 3 reviews
     {
         place: "Debre Birhan Silase Church",
-        user: "Samuel",
+        user: "Samuel",/*  */
         rating: 5,
         body: "A beautiful church with a meaningful religious and historical atmosphere.",
     },
