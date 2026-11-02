@@ -15,12 +15,14 @@ const places = [
         description:
             "A historic Ethiopian Orthodox Tewahedo church in Debre Berhan associated with the city's religious heritage and the reign of Emperor Zara Yaqob.",
         openingHours: "08:00–17:00",
+        imageUrl: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80",
     },
     {
         name: "Emperor Zera Yacob Square",
         category: "History",
         description:
             "A public square in central Debre Berhan featuring a monument honoring Emperor Zara Yaqob, the historical founder of the city.",
+        imageUrl: "https://images.unsplash.com/photo-1590059390046-608157778b40?auto=format&fit=crop&w=800&q=80",
         openingHours: "06:00–18:00",
     },
     {
@@ -28,6 +30,7 @@ const places = [
         category: "History",
         description:
             "An Ethiopian Orthodox Tewahedo church in Debre Berhan dedicated to Saint Gabriel and serving as a local religious landmark.",
+        imageUrl: "https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=800&q=80",
         openingHours: "06:00–18:00",
     },
     {
@@ -35,6 +38,7 @@ const places = [
         category: "Culture",
         description:
             "A traditional marketplace where visitors can explore local products, agricultural goods, traditional items, and everyday community life.",
+        imageUrl: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=800&q=80",
         openingHours: "08:00–18:00",
     },
     {
@@ -42,6 +46,7 @@ const places = [
         category: "Food",
         description:
             "A modern hotel in Debre Berhan offering accommodation, restaurant services, dining facilities, and Ethiopian hospitality.",
+        imageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
         openingHours: "07:00–22:00",
     },
     {
@@ -49,6 +54,7 @@ const places = [
         category: "Food",
         description:
             "A hotel in Debre Berhan offering accommodation, restaurant services, and facilities for visitors and travelers.",
+        imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
         openingHours: "07:00–22:00",
     },
     {
@@ -56,6 +62,7 @@ const places = [
         category: "Nature",
         description:
             "A high-altitude conservation area in the Menz region featuring Afro-alpine landscapes, Ethiopian wolves, gelada monkeys, and hiking opportunities.",
+        imageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80",
         openingHours: "07:30–18:00",
     },
     {
@@ -63,6 +70,7 @@ const places = [
         category: "History",
         description:
             "A historic Ethiopian Orthodox pilgrimage site near Debre Berhan known for its religious heritage, holy water, and spiritual significance.",
+        imageUrl: "https://images.unsplash.com/photo-1438032005730-c779502df39b?auto=format&fit=crop&w=800&q=80",
         openingHours: "06:00–18:00",
     },
     {
@@ -70,6 +78,7 @@ const places = [
         category: "History",
         description:
             "An Ethiopian Orthodox monastery near Debre Berhan known for its religious heritage, pilgrimage traditions, and distinctive surroundings.",
+        imageUrl: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80",
         openingHours: "06:00–18:00",
     },
     {
@@ -77,6 +86,7 @@ const places = [
         category: "Education",
         description:
             "A public university in Debre Berhan contributing to higher education, research, innovation, and academic development in Ethiopia.",
+        imageUrl: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80",
         openingHours: "08:30–17:30",
     },
     {
@@ -84,6 +94,7 @@ const places = [
         category: "Culture",
         description:
             "A historically important textile manufacturing landmark associated with Ethiopian blanket production and the industrial heritage of Debre Berhan.",
+        imageUrl: "https://images.unsplash.com/photo-1584992236310-6edddc08acff?auto=format&fit=crop&w=800&q=80",
         openingHours: "08:30–17:30",
     },
 ];
@@ -336,6 +347,7 @@ async function seed() {
                             category: place.category,
                             description: place.description,
                             openingHours: place.openingHours,
+                            imageUrl: place.imageUrl,
                         },
                     })
                     : await tx.place.create({

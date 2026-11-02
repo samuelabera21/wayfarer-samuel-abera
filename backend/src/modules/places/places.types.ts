@@ -4,6 +4,7 @@ export interface PlaceResponse {
   category: string;
   description: string;
   openingHours: string | null;
+  imageUrl: string | null;
   averageRating: number | null;
   reviewCount: number;
   weightedRating: number;

@@ -33,6 +33,7 @@ export async function getPlaces(
       category: true,
       description: true,
       openingHours: true,
+      imageUrl: true,
     },
     orderBy: {
       id: "asc",
@@ -98,6 +99,7 @@ export async function getPlaces(
       category: place.category,
       description: place.description,
       openingHours: place.openingHours,
+      imageUrl: place.imageUrl,
       averageRating,
       reviewCount,
       weightedRating,

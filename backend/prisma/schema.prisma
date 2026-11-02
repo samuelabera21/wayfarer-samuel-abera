@@ -25,6 +25,7 @@ model Place {
   category     String   @db.VarChar(50)
   description  String   @db.Text
   openingHours String?  @map("opening_hours") @db.Text
+  imageUrl     String?  @map("image_url") @db.Text
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   reviews   Review[]
