@@ -11,9 +11,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
-    "seed": "tsx prisma/seed.ts",
-    "demo:create": "tsx scripts/create-ranking-demo.ts",
-    "demo:clean": "tsx scripts/cleanup-ranking-demo.ts"
+    "seed": "tsx prisma/seed.ts"
   },
   "prisma": {
     "seed": "prisma db seed"
