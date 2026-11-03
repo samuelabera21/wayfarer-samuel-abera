@@ -116,8 +116,8 @@ export function PlacesExplorer() {
             mobileView === "detail" ? "hidden" : "block"
           } lg:block lg:col-span-5 lg:sticky lg:top-[128px] lg:self-start lg:max-h-[calc(100vh-9.5rem)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200`}
         >
-          {/* Sort control bar directly above places list */}
-          <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+          {/* Sticky Sort control bar directly above places list (remains visible on scroll) */}
+          <div className="sticky top-0 z-10 bg-slate-50 pt-1 pb-3 mb-3 border-b border-slate-200 flex items-center justify-between">
             <SortControl
               sortBy={sortBy}
               onChange={handleSortChange}
